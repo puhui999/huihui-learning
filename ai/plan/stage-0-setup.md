@@ -1,0 +1,38 @@
+# 阶段 0：环境与 Spring Boot 4 前置（第 0 周，~12h）
+
+> 一句话目标：所有基础设施打通，第一个 ChatClient 调用跑起来。
+> 这是原计划完全遗漏的一步：**Spring AI 2.0 硬依赖 Spring Boot 4.0 + Spring Framework 7**。如果你日常在 Boot 2.7/3.x（yudao 那套），先补差异再开工，否则第 1 周会浪费在依赖报错上。
+
+## 任务清单
+
+### 1. 基础环境（~3h）
+- [ ] JDK 21 安装（推荐 sdkman 管理多版本），IDEA 确认支持 Boot 4
+- [ ] Maven 配置国内镜像（阿里云），确认能拉 `org.springframework.ai` 坐标
+- [ ] Docker Desktop 可用
+
+### 2. Spring Boot 4 差异速览（~4h，只看跟自己相关的）
+- [ ] Framework 7 + Boot 4 基线要求（JDK 17+，我们直接用 21）
+- [ ] 对照官方 migration guide 扫一遍配置属性与自动装配的主要变化（不用背）
+- [ ] Spring Initializr 生成 Boot 4 空项目，把熟悉的 Controller/Service/配置写一遍找手感
+
+### 3. 模型与中间件（~3h）
+- [ ] 注册 DeepSeek 开放平台或阿里云百炼，API Key 配成环境变量（**绝不写进会提交的文件**）
+- [ ] Ollama 安装，拉一个 qwen 系小模型（如 `ollama pull qwen3:4b`）本地能对话
+- [ ] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`
+
+### 4. 第一个调用（~2h）
+- [ ] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter
+- [ ] application.yml 把 base-url 指向 DeepSeek/百炼，注入 ChatClient，写一个 GET 接口返回模型回答
+
+## 验收标准（DoD）
+- `curl localhost:8080/ai/hello` 返回模型生成内容
+- Ollama 能本地对话；PgVector 容器重启后数据仍在
+- API Key 不出现在任何会提交的文件里
+
+## 踩坑预警
+- Spring AI 2.0.0 有 CVE-2026-59318（提示注入可触发未披露工具调用），版本必须 ≥ 2.0.1
+- Boot 3.x 项目直接加 Spring AI 2.0 依赖会失败——不是网络问题，是硬依赖 Boot 4
+- 国内拉 Maven/镜像慢，先配好镜像源再开始，不要边下边学
+
+## 搜索关键词
+Spring Boot 4 migration guide ｜ Spring AI 2.0 getting started ｜ pgvector docker ｜ Ollama qwen

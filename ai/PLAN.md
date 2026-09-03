@@ -20,7 +20,7 @@
 | 工具协议 | MCP Java SDK | 2.0.x | 对应 2025-11-25 协议规范 |
 | 向量库 | PgVector | — | 入门首选；Milvus 只做阅读 |
 | 本地推理 | 不采用 | — | 2026-09-02 决定不自建模型服务，全程走 API |
-| 模型 API | DeepSeek（对话）+ 通义百炼（Embedding、备用对话） | — | OpenAI 兼容；DeepSeek 无 Embedding 接口，RAG 用百炼 text-embedding-v4；全程费用 < ¥100 |
+| 模型 API | DeepSeek（对话）+ 通义百炼（Embedding、备用对话） | — | OpenAI 兼容；对话模型用 `deepseek-v4-flash`（旧名 deepseek-chat 已公告停用）；DeepSeek 无 Embedding 接口，RAG 用百炼 text-embedding-v4；全程费用 < ¥100 |
 | 概念阅读 | A2A（SDK 实际仍 0.3.x）、AgentScope Java | — | 与 Spring AI Alibaba 合流中，不重仓 |
 
 ## 路线总览
@@ -42,7 +42,7 @@
 | 阶段 | 状态 | 开始日期 | 验收日期 | 备注 |
 |---|---|---|---|---|
 | 0 前置 | ✅ 已验收 | 2026-09-01 | 2026-09-03 | runbook 见 notes/w00-环境搭建.md；Boot 4 差异速览搁置，阶段 1 遇到再补 |
-| 1 裸调 API | ⬜ 未开始 | | | |
+| 1 裸调 API | 🔵 进行中 | 2026-09-03 | | runbook 见 notes/w01-裸调API与多轮对话.md；模型改 deepseek-v4-flash（deepseek-chat 已公告停用） |
 | 2 Spring AI 核心 | ⬜ 未开始 | | | |
 | 3 RAG + 评估 | ⬜ 未开始 | | | |
 | 4 Agent + MCP | ⬜ 未开始 | | | |

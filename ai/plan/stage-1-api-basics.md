@@ -2,6 +2,7 @@
 
 > 一句话目标：不借助 Spring AI，徒手理解 OpenAI 兼容协议的每一个字段，做出流式对话应用。
 > 为什么裸调：框架的每层抽象你都见过"裸"的样子，后面 Debug 才不心虚。
+> 2026-09-03 开始。第 1 周 runbook：[w01](../notes/w01-裸调API与多轮对话.md)。决策：模型 `deepseek-v4-flash` 并显式关思考模式；Web MVC + `spring-boot-starter-webclient`（不上 WebFlux 服务端）；usage 表放 pgvector 容器的 Postgres；成本折算带 DeepSeek 峰谷时段。
 
 ## 第 1 周：协议与多轮对话
 

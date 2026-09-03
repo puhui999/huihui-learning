@@ -19,7 +19,7 @@
 - [ ] Actuator 暴露 AI 指标；Prompt 版本管理（改动可追溯、可回滚）
 
 ### 交付
-- [ ] Docker 镜像 + Docker Compose 一键起（app + PgVector + Redis + Ollama 可选）
+- [ ] Docker 镜像 + Docker Compose 一键起（app + PgVector + Redis）
 - [ ] GitHub Actions CI：构建 + 测试 + 镜像
 - [ ] 在线 demo（云服务器或内网穿透，可访问即可）
 - [ ] 文档四件套：README（30 分钟跑通指引）/ 架构图 / 评估报告（阶段 3 数字的更新版）/ 技术取舍说明（为什么 PgVector 不是 Milvus、为什么这样切分……）

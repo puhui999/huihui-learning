@@ -6,7 +6,7 @@
 
 - [ ] ChatModel（底层策略）vs ChatClient（高层门面）；什么时候才需要碰 ChatModel
 - [ ] Prompt / ChatResponse / Generation 数据模型；application.yml 配模型参数
-- [ ] 多模型切换：改依赖 + 改配置、业务零改动——亲手切一轮 DeepSeek ↔ 通义 ↔ Ollama
+- [ ] 多模型切换：改依赖 + 改配置、业务零改动——亲手切一轮 DeepSeek ↔ 通义
 - [ ] Advisor = AI 领域的 AOP：洋葱模型、执行顺序（order）
 - [ ] 内置 Advisor 实操：SimpleLoggerAdvisor、MessageChatMemoryAdvisor、SafeGuardAdvisor
   （注意：真名不是 SafetyAdvisor，且它只是敏感词拦截，很简陋，别指望它做真正的内容安全）

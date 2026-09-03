@@ -6,18 +6,18 @@
 ## 任务清单
 
 ### 1. 基础环境（~3h）
-- [ ] JDK 21 安装（推荐 sdkman 管理多版本），IDEA 确认支持 Boot 4
+- [ ] JDK 25 安装并设好 JAVA_HOME，IDEA 确认支持 Boot 4
 - [ ] Maven 配置国内镜像（阿里云），确认能拉 `org.springframework.ai` 坐标
-- [ ] Docker Desktop 可用
+- [x] Docker Desktop 可用
 
 ### 2. Spring Boot 4 差异速览（~4h，只看跟自己相关的）
-- [ ] Framework 7 + Boot 4 基线要求（JDK 17+，我们直接用 21）
+- [ ] Framework 7 + Boot 4 基线要求（JDK 17+，兼容到 26，我们直接用 25）
 - [ ] 对照官方 migration guide 扫一遍配置属性与自动装配的主要变化（不用背）
 - [ ] Spring Initializr 生成 Boot 4 空项目，把熟悉的 Controller/Service/配置写一遍找手感
 
 ### 3. 模型与中间件（~3h）
 - [ ] 注册 DeepSeek 开放平台或阿里云百炼，API Key 配成环境变量（**绝不写进会提交的文件**）
-- [ ] Ollama 安装，拉一个 qwen 系小模型（如 `ollama pull qwen3:4b`）本地能对话
+- 不自建模型服务（2026-09-02 决定），Ollama 从计划移除，全程走 API
 - [ ] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`
 
 ### 4. 第一个调用（~2h）
@@ -26,7 +26,7 @@
 
 ## 验收标准（DoD）
 - `curl localhost:8080/ai/hello` 返回模型生成内容
-- Ollama 能本地对话；PgVector 容器重启后数据仍在
+- PgVector 容器重启后数据仍在
 - API Key 不出现在任何会提交的文件里
 
 ## 踩坑预警
@@ -35,4 +35,4 @@
 - 国内拉 Maven/镜像慢，先配好镜像源再开始，不要边下边学
 
 ## 搜索关键词
-Spring Boot 4 migration guide ｜ Spring AI 2.0 getting started ｜ pgvector docker ｜ Ollama qwen
+Spring Boot 4 migration guide ｜ Spring AI 2.0 getting started ｜ pgvector docker

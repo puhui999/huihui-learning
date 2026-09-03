@@ -8,7 +8,7 @@
 - [ ] Apache Tika 解析 PDF / Word / Markdown；DocumentReader / DocumentTransformer 接口
 - [ ] 切分策略：固定长度 / 递归 / 语义切分对比；经验值 chunk 500-1500 字符、overlap 10-20%
 - [ ] 元数据设计（关键）：来源文件、章节、更新时间、**权限标签（部门/角色）**——第 7 周要用
-- [ ] Embedding 选型：通义 text-embedding（API）vs bge 系列（Ollama 本地）；维度与建表的关系
+- [ ] Embedding 选型：百炼 text-embedding-v4 为主（DeepSeek 无 Embedding 接口，开工时核实最新版本），可对比 v3 或 OpenAI text-embedding-3-small；维度与建表的关系
 - [ ] PgVector 入库：VectorStore 接口 + 索引；增量更新（同一文件重新上传怎么处理）
 
 ## 第 6 周：检索生成闭环 + 评估基建 ⭐ 本阶段最重要的一周

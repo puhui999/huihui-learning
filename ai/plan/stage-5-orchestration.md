@@ -18,8 +18,8 @@
   （注意：真名不是 RedisSemanticCacheAdvisor）
 - [ ] Resilience4j：超时 / 重试（分清哪些错误可重试）/ 熔断 / 降级话术
 - [ ] 多模型 Failover：主模型故障切备用模型、权重路由
-- [ ] Ollama 本地链路：开发/测试环境完全离线跑通
-- [ ] Java 21 虚拟线程：I/O 密集的工具调用并行化实测
+- [ ] 无外网测试链路：用 WireMock 录制回放或自定义 ChatModel 桩替代真实 API，让单测/集成测试不依赖网络与额度
+- [ ] Java 25 虚拟线程：I/O 密集的工具调用并行化实测
 
 ## 实战任务：demo-05-workflow
 
@@ -39,4 +39,4 @@
 3. 重试策略里，哪类错误绝不能重试？为什么？
 
 ## 搜索关键词
-Spring AI Alibaba Graph 工作流 ｜ multi-agent supervisor pattern ｜ Spring AI SemanticCacheAdvisor ｜ Resilience4j Spring Boot ｜ Java 21 virtual threads
+Spring AI Alibaba Graph 工作流 ｜ multi-agent supervisor pattern ｜ Spring AI SemanticCacheAdvisor ｜ Resilience4j Spring Boot ｜ Java 25 virtual threads

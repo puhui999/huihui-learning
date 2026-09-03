@@ -18,7 +18,7 @@
 ### 3. 模型与中间件（~3h）
 - [x] 注册 DeepSeek 开放平台或阿里云百炼，API Key 配成环境变量（**绝不写进会提交的文件**）
 - 不自建模型服务（2026-09-02 决定），Ollama 从计划移除，全程走 API
-- [ ] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`
+- [x] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`（2026-09-03 容器已起，重启持久化在验收时核）
 
 ### 4. 第一个调用（~2h）
 - [x] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter（demo-00-hello）

@@ -6,8 +6,8 @@
 ## 任务清单
 
 ### 1. 基础环境（~3h）
-- [ ] JDK 25 安装并设好 JAVA_HOME，IDEA 确认支持 Boot 4
-- [ ] Maven 配置国内镜像（阿里云），确认能拉 `org.springframework.ai` 坐标
+- [x] JDK 25 安装并设好 JAVA_HOME，IDEA 确认支持 Boot 4（Temurin 25.0.4.1）
+- [x] Maven 直连已能拉到 `org.springframework.ai` 坐标，未配阿里云镜像，慢了再配
 - [x] Docker Desktop 可用
 
 ### 2. Spring Boot 4 差异速览（~4h，只看跟自己相关的）
@@ -16,13 +16,13 @@
 - [ ] Spring Initializr 生成 Boot 4 空项目，把熟悉的 Controller/Service/配置写一遍找手感
 
 ### 3. 模型与中间件（~3h）
-- [ ] 注册 DeepSeek 开放平台或阿里云百炼，API Key 配成环境变量（**绝不写进会提交的文件**）
+- [x] 注册 DeepSeek 开放平台或阿里云百炼，API Key 配成环境变量（**绝不写进会提交的文件**）
 - 不自建模型服务（2026-09-02 决定），Ollama 从计划移除，全程走 API
 - [ ] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`
 
 ### 4. 第一个调用（~2h）
-- [ ] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter
-- [ ] application.yml 把 base-url 指向 DeepSeek/百炼，注入 ChatClient，写一个 GET 接口返回模型回答
+- [x] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter（demo-00-hello）
+- [x] application.yml 把 base-url 指向 DeepSeek/百炼，注入 ChatClient，写一个 GET 接口返回模型回答（2026-09-03 跑通）
 
 ## 验收标准（DoD）
 - `curl localhost:8080/ai/hello` 返回模型生成内容

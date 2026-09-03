@@ -1,5 +1,5 @@
 ### 默认问题：验证 ChatClient 链路是否打通
-GET {{host}}/ai/hello
+GET http://localhost:8080/ai/hello
 
 > {%
     client.test("返回 200 且有内容", function () {
@@ -9,10 +9,10 @@ GET {{host}}/ai/hello
 %}
 
 ### 自定义问题：q 参数
-GET {{host}}/ai/hello
+GET http://localhost:8080/ai/hello
     ?q=用三句话说明SpringBoot4相比3最大的变化
 
 ### 错误路径：Key 无效时应看到 500，日志里有 401 Authentication Fails
 # 想复现就把环境变量改成假值重启应用，正常情况下这条也返回 200
-GET {{host}}/ai/hello
+GET http://localhost:8080/ai/hello
     ?q=你好

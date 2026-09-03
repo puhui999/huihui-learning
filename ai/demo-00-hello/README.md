@@ -10,7 +10,7 @@
 .\mvnw.cmd spring-boot:run
 ```
 
-接口测试用 IDEA HTTP Client：打开 `http/hello.http`，右上角环境选 `dev`，点每个请求前的运行箭头。第一个请求带断言，绿色即通过。
+接口测试用 IDEA HTTP Client：打开 `HelloController.java` 旁边的 `HelloController.http`，点每个请求前的运行箭头。第一个请求带断言，绿色即通过。
 不用 IDEA 时：`curl.exe -s http://localhost:8080/ai/hello`。
 
 ## 骨架已有
@@ -18,7 +18,7 @@
 - `application.yml`：DeepSeek OpenAI 兼容配置，Key 只从环境变量读
 - `HelloController`：`GET /ai/hello`，注入 `ChatClient.Builder` 调模型
 - `HelloApplicationTests`：上下文加载冒烟测试，不依赖环境变量
-- `http/hello.http` + `http-client.env.json`：IDEA HTTP Client 请求与环境，私有环境文件 `http-client.private.env.json` 已全局 gitignore
+- `HelloController.http`：IDEA HTTP Client 请求文件，与 Controller 同目录；需要 token 的请求以后放 `http-client.private.env.json`，已全局 gitignore
 
 ## 找手感（阶段 0 任务 2，自己写）
 

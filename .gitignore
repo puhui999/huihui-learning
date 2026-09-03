@@ -24,6 +24,7 @@ out/
 *-local.yml
 *-local.yaml
 application-local.properties
+http-client.private.env.json
 
 # ---- 前端 / 工具生成 ----
 node_modules/

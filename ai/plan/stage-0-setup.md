@@ -11,6 +11,9 @@
 - [x] Docker Desktop 可用
 
 ### 2. Spring Boot 4 差异速览（~4h，只看跟自己相关的）
+
+> 2026-09-03 验收时决定**搁置**：不在 AI 主线上，阶段 1 写代码碰到 Jackson 3 / 测试切片差异时再按需补。demo-00-hello 的 README 里留有分层练习设计。
+
 - [ ] Framework 7 + Boot 4 基线要求（JDK 17+，兼容到 26，我们直接用 25）
 - [ ] 对照官方 migration guide 扫一遍配置属性与自动装配的主要变化（不用背）
 - [ ] Spring Initializr 生成 Boot 4 空项目，把熟悉的 Controller/Service/配置写一遍找手感

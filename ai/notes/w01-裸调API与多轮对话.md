@@ -1,6 +1,6 @@
 # w01 裸调 API 与多轮对话（阶段 1 · 第 1 周）
 
-> 开始：2026-09-03 ｜ 目标：[stage-1](../plan/stage-1-api-basics.md) 第 1 周清单全勾，demo-01 的多轮对话 + usage 入库跑通 ｜ 预算 ~25h，拆成 5 个工作日 + 周末收尾
+> 开始：2026-09-03 ｜ 目标：[stage-1](../plan/stage-1-api-basics.md) 第 1 周清单全勾，huihui-ai 工程 `chat` 包的多轮对话 + usage 入库跑通 ｜ 预算 ~25h，拆成 5 个工作日 + 周末收尾
 > 实操在 Windows 主机，命令按 **PowerShell** 写；接口一律用 IDEA HTTP Client 的 `.http` 文件。
 > 第 2 周（SSE 流式 + Prompt 工程）另开 w02，本文末尾只给预告和现在就要定下的设计。
 
@@ -14,6 +14,7 @@
 | usage 表放在 pgvector 容器里的 Postgres `ai` 库 | 容器已在跑，不新起 | 阶段 3 的向量表也在这个库，一套连接配置用到底 |
 | 成本折算要带时段 | DeepSeek 2026-08-17 起峰谷定价：**工作日北京时间 9:00-12:00、14:00-18:00 为高峰，其余时段半价** | 你晚上学习全在闲时；不带时段算出来的钱和平台账单必然对不上 |
 | 供应商切换靠 profile | `application.yml` 默认 DeepSeek，`application-bailian.yml` 覆盖 base-url / key / model / 定价 | 实战任务第 5 条"只改配置不改代码"从 Day 3 的配置设计就开始满足 |
+| 所有阶段共用一个工程 `ai/huihui-ai`，按阶段分包 | 2026-09-05 你的决定：demo 太多、每次都要重配环境。demo-00 已并入 `hello` 包，阶段 1 写在 `chat` 包，跨阶段共用的放 `common` | 一个 IDEA 窗口、一份 yml、一个库、一套 Run Configuration |
 
 ## 核实过的事实（写代码前先知道）
 
@@ -50,56 +51,61 @@
 - `spring.threads.virtual.enabled: true`：Tomcat 与应用线程池走虚拟线程，Boot 4 还会顺手把 Reactor 的 boundedElastic 调度器切到虚拟线程
 - Jackson 3：`@JsonNaming` 搬到了 `tools.jackson.databind.annotation`，`PropertyNamingStrategies` 在 `tools.jackson.databind`；`@JsonProperty` / `@JsonInclude` 仍在 `com.fasterxml.jackson.annotation`。**未知字段默认不再报错**（3.0 把 `FAIL_ON_UNKNOWN_PROPERTIES` 默认改成 false），所以响应 record 只声明你关心的字段即可
 
-## demo-01-chat-sse 目标结构（整个阶段；本周只做 ①②③）
+## 阶段 1 在 huihui-ai 里的目标结构（整个阶段；本周只做 ①②③）
 
 ```
-com.huihui.ai.chat
-├── ChatSseApplication              @SpringBootApplication + @ConfigurationPropertiesScan
-├── config/
-│   ├── LlmProperties               ① record，prefix app.llm：provider、baseUrl、apiKey、model、thinking、pricing
-│   └── LlmClientConfig             ① WebClient bean：baseUrl + Authorization 头
-├── llm/                            ① 裸协议层：字段与 OpenAI 兼容接口一一对应，不掺业务
-│   ├── ChatMessage                    record(role, content)，静态工厂 system()/user()/assistant()
-│   ├── ChatCompletionRequest          model、messages、temperature、maxTokens、stream、streamOptions、responseFormat、thinking
-│   ├── ChatCompletionResponse         id、model、created、choices[]（message、finishReason）、usage
-│   ├── ChatCompletionChunk            第 2 周：流式 chunk，choices[].delta.content + 末块 usage
-│   ├── Usage                          见上面字段清单，附 cachedTokens() 统一两家字段名
-│   ├── LlmUpstreamException           上游非 2xx：带 status + 原始 body
-│   ├── OpenAiCompatClient             complete(req)；第 2 周加 stream(req) → Flux<ChatCompletionChunk>
-│   └── OpenAiCompatClient.http        Day 1 手点协议的请求集（放在它要封装的类旁边）
-├── conversation/                   ② 多轮对话
-│   ├── Conversation                   sessionId、history、每会话一把锁
-│   ├── InMemoryConversationStore      ConcurrentHashMap
-│   ├── ContextWindowPolicy            只保留最近 N 轮（先做）/ 按 token 预算截断（选做）
-│   └── ChatService                    组装 messages → 调 client → 追加历史 → 记 usage
-├── usage/                          ③ 用量与成本
-│   ├── UsageRecord、UsageRepository   JdbcClient 读写 chat_usage 表
-│   ├── CostCalculator                 峰谷判断 + 三段单价折算
-│   └── UsageService                   按天 / 按会话汇总
-├── prompt/                         第 2 周：模板加载与变量替换
-└── web/
-    ├── ChatController (+ .http)       POST /api/chat；GET/DELETE /api/sessions/{id}
-    ├── UsageController (+ .http)      GET /api/usage/daily、/api/usage/sessions/{id}
-    ├── GlobalExceptionHandler         LlmUpstreamException → 502 带上游状态码；参数错 → 400
-    └── (第 2 周) 流式端点 + static/index.html 打字机页
+com.huihui.ai
+├── HuihuiAiApplication             已有：@SpringBootApplication + @ConfigurationPropertiesScan
+├── hello/                          已有：阶段 0 的 /ai/hello
+├── common/                         跨阶段共用
+│   ├── web/GlobalExceptionHandler     ① LlmUpstreamException → 502 带上游状态码；参数错 → 400
+│   └── usage/                         ③ 用量与成本（阶段 2 起 Spring AI 的调用也往这记）
+│       ├── UsageRecord、UsageRepository   JdbcClient 读写 chat_usage 表
+│       ├── CostCalculator                 峰谷判断 + 三段单价折算
+│       ├── UsageService                   按天 / 按会话汇总
+│       └── UsageController (+ .http)      GET /api/usage/daily、/api/usage/sessions/{id}
+└── chat/                           阶段 1
+    ├── config/
+    │   ├── LlmProperties               ① record，prefix app.llm（yml 里这一段已放好，绑定即可）
+    │   └── LlmClientConfig             ① WebClient bean：baseUrl + Authorization 头
+    ├── llm/                            ① 裸协议层：字段与 OpenAI 兼容接口一一对应，不掺业务
+    │   ├── ChatMessage                    record(role, content)，静态工厂 system()/user()/assistant()
+    │   ├── ChatCompletionRequest          model、messages、temperature、maxTokens、stream、streamOptions、responseFormat、thinking
+    │   ├── ChatCompletionResponse         id、model、created、choices[]（message、finishReason）、usage
+    │   ├── ChatCompletionChunk            第 2 周：流式 chunk，choices[].delta.content + 末块 usage
+    │   ├── Usage                          见上面字段清单，附 cachedTokens() 统一两家字段名
+    │   ├── LlmUpstreamException           上游非 2xx：带 status + 原始 body
+    │   ├── OpenAiCompatClient             complete(req)；第 2 周加 stream(req) → Flux<ChatCompletionChunk>
+    │   └── OpenAiCompatClient.http        Day 1 手点协议的请求集（放在它要封装的类旁边）
+    ├── conversation/                   ② 多轮对话
+    │   ├── Conversation                   sessionId、history、每会话一把锁
+    │   ├── InMemoryConversationStore      ConcurrentHashMap
+    │   ├── ContextWindowPolicy            只保留最近 N 轮（先做）/ 按 token 预算截断（选做）
+    │   └── ChatService                    组装 messages → 调 client → 追加历史 → 记 usage
+    ├── prompt/                         第 2 周：模板加载与变量替换
+    └── web/
+        ├── ChatController (+ .http)       POST /api/chat；GET/DELETE /api/sessions/{id}
+        └── (第 2 周) 流式端点；打字机页放 resources/static/chat.html
 ```
 
 ## 执行清单（按天）
 
 ### Day 1（~3h）：协议先用手点一遍，再生成骨架
 
-**1. 生成项目**（10 分钟）
+**1. 拉代码，确认环境一次配好**（10 分钟）
 
 ```powershell
-cd huihui-learning\ai
-curl.exe -s -o demo-01-chat-sse.zip https://start.spring.io/starter.zip -d type=maven-project -d language=java -d bootVersion=4.0.8 -d javaVersion=25 -d groupId=com.huihui.ai -d artifactId=demo-01-chat-sse -d name=demo-01-chat-sse -d packageName=com.huihui.ai.chat -d baseDir=demo-01-chat-sse -d dependencies=web,spring-webclient,jdbc,postgresql,validation
-Expand-Archive demo-01-chat-sse.zip -DestinationPath . ; Remove-Item demo-01-chat-sse.zip
-cd demo-01-chat-sse; Remove-Item HELP.md
+cd huihui-learning
+git status                      # demo-00-hello 下若有未提交改动，先 git stash 再 pull
+git pull
+cd ai\huihui-ai
+.\mvnw.cmd spring-boot:run        # /ai/hello 通 = 环境 OK，后面各阶段都不用再配
 ```
 
-检查 pom：parent `4.0.8`、`java.version` 25，依赖里有 `spring-boot-starter-webmvc`、`spring-boot-starter-webclient`、`spring-boot-starter-jdbc`、`postgresql`(runtime)、`spring-boot-starter-validation`，测试依赖是 `spring-boot-starter-webmvc-test` 等 `-test` 拆包。没有 Spring AI，这是有意的。
+工程里已经有：pom（webmvc、webclient、jdbc、postgresql、validation、Spring AI 全在）、`application.yml`（DeepSeek、数据源、`app.llm` 三段）、`application-bailian.yml`、主类 `HuihuiAiApplication`。IDEA 打开 `ai/huihui-ai`，确认 Project SDK 是 25。
+阶段 1 的代码全部写在 `com.huihui.ai.chat` 包和 `common` 包里，不再新建工程。如果这两天已经在本地生成了 demo-01-chat-sse：包名一样是 `com.huihui.ai.chat`，把 `src` 下写好的文件按原路径复制进来即可，然后删掉 demo-01 目录。
 
-**2. 建 `llm/OpenAiCompatClient.http`，手点协议**（1.5h）
+**2. 建 `chat/llm/OpenAiCompatClient.http`，手点协议**（1.5h）
 
 IDEA HTTP Client 能直接读系统环境变量：`{{$env.DEEPSEEK_API_KEY}}`，不需要 env 文件（IDEA 启动时快照环境，改过变量要重启 IDEA，和 w00 那个坑同源）。
 
@@ -156,45 +162,9 @@ Content-Type: application/json
 
 ### Day 3（~4h）：Java 骨架：配置 + WebClient + 非流式单轮
 
-**配置**——`application.yml` 默认 DeepSeek，Key 只从环境变量读：
+**配置**——`application.yml` 里的 `app.llm` 段和 `application-bailian.yml` 我已经放好（默认 DeepSeek，Key 只从环境变量读；HTTP 客户端超时、虚拟线程、数据源也都配了）。你要做的：读一遍这两个文件，把 Day 1 抄的单价核对进去，然后写 `chat/config/LlmProperties`：`@ConfigurationProperties(prefix = "app.llm")` 的 record，字段 `provider、baseUrl、apiKey、model、thinking、Pricing pricing`，嵌套 `Pricing(cacheHit, cacheMiss, output, offPeakRatio, List<String> peakWindows)`。主类已有 `@ConfigurationPropertiesScan`，不用注册。
 
-```yaml
-spring:
-  application:
-    name: demo-01-chat-sse
-  threads:
-    virtual:
-      enabled: true
-  http:
-    clients:
-      connect-timeout: 5s
-      read-timeout: 90s          # 等待数据的空闲超时，不是整个响应总时长；流式每个 chunk 都会刷新它
-  datasource:
-    url: jdbc:postgresql://localhost:5432/ai
-    username: postgres
-    password: postgres
-  sql:
-    init:
-      mode: always               # 启动执行 schema.sql（Day 5 再加文件）
-
-app:
-  llm:
-    provider: deepseek
-    base-url: https://api.deepseek.com
-    api-key: ${DEEPSEEK_API_KEY}
-    model: deepseek-v4-flash
-    thinking: false
-    pricing:                     # 元 / 百万 token，高峰价；闲时乘 off-peak-ratio
-      cache-hit: 0.1
-      cache-miss: 3
-      output: 9
-      off-peak-ratio: 0.5
-      peak-windows: ["09:00-12:00", "14:00-18:00"]   # 工作日北京时间，空列表表示无峰谷
-```
-
-`application-bailian.yml` 只写差异：`provider: bailian`、`base-url: https://dashscope.aliyuncs.com/compatible-mode/v1`、`api-key: ${DASHSCOPE_API_KEY}`、`model: qwen-plus`、`pricing.cache-hit: 0.08 / cache-miss: 0.8 / output: 2 / off-peak-ratio: 1.0 / peak-windows: []`。切换：`.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=bailian"`，或 IDEA Run Configuration 的 Active profiles 填 `bailian`。
-
-`LlmProperties` 用 `@ConfigurationProperties(prefix = "app.llm")` 的 record，嵌套 `Pricing` record；主类加 `@ConfigurationPropertiesScan`。
+切换供应商：`.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=bailian"`，或 IDEA Run Configuration 的 Active profiles 填 `bailian`。
 
 **WebClient bean**——Boot 给的 `WebClient.Builder` 是原型作用域，直接在上面加 baseUrl 和鉴权头：
 
@@ -248,7 +218,7 @@ public ChatCompletionResponse complete(ChatCompletionRequest request) {
 }
 ```
 
-**Controller 与异常处理**：`POST /api/chat`，请求体 `{"message": "..."}`（先单轮），返回 `ChatReply(sessionId, content, finishReason, usage, latencyMs)`；`GlobalExceptionHandler` 把 `LlmUpstreamException` 映射成 502，message 里带上游状态码和 body 前 200 字（沿用 demo-00 README 里那套设计）；`@Valid` 校验 message 非空、长度上限。`ChatController.http` 放同目录：正常路径带断言 + 一条超长消息看 400。
+**Controller 与异常处理**：`POST /api/chat`，请求体 `{"message": "..."}`（先单轮），返回 `ChatReply(sessionId, content, finishReason, usage, latencyMs)`；`common/web/GlobalExceptionHandler` 把 `LlmUpstreamException` 映射成 502，message 里带上游状态码和 body 前 200 字（沿用 huihui-ai README 附录第 5 条那套设计）；`@Valid` 校验 message 非空、长度上限。`ChatController.http` 放同目录：正常路径带断言 + 一条超长消息看 400。
 
 Day 3 完成标准：`.http` 打通，返回里能看到 `usage` 和 `finishReason`；把环境变量改成假 Key 重启，返回 502 且 message 里有 401。
 
@@ -329,11 +299,11 @@ jdbcClient.sql("""
 
 ### Day 6-7（~4h）：测试、README、复盘
 
-- 不依赖 Key 的测试：`ContextWindowPolicyTest`、`CostCalculatorTest`（高峰边界 9:00 / 12:00 / 周六）、`ChatControllerTest`（`@WebMvcTest(ChatController.class)` + `@MockitoBean ChatService` + `MockMvcTester`，写法见 demo-00 README 第 6 条）。真调 API 的测试可选，用 `@EnabledIfEnvironmentVariable(named = "DEEPSEEK_API_KEY", matches = ".+")` 标记，没 Key 自动跳过
-- `@SpringBootTest` 的 contextLoads 会连库，pgvector 容器不在跑就红——在 README 写明
-- README：启动方式、Key 注入方式（环境变量名）、profile 切换、接口清单、`.http` 在哪
+- 不依赖 Key 的测试：`ContextWindowPolicyTest`、`CostCalculatorTest`（高峰边界 9:00 / 12:00 / 周六）、`ChatControllerTest`（`@WebMvcTest(ChatController.class)` + `@MockitoBean ChatService` + `MockMvcTester`，写法见 huihui-ai README 附录第 6 条）。真调 API 的测试可选，用 `@EnabledIfEnvironmentVariable(named = "DEEPSEEK_API_KEY", matches = ".+")` 标记，没 Key 自动跳过
+- 冒烟测试已把 `spring.sql.init.mode` 设为 never，不依赖容器；真连库的 Repository 测试需要容器在跑，README 里写明
+- README：在"阶段 → 包 → 入口"表里把阶段 1 的接口补全，需要的话补启动说明
 - 本文"踩坑记录"补齐，然后说"周复盘"，我出小测
-- 提交：`git add ai/demo-01-chat-sse ai/notes; git commit -m "feat(ai): demo-01 多轮对话与 usage 入库"; git push`
+- 提交：`git add ai/huihui-ai ai/notes; git commit -m "feat(ai): 阶段 1 多轮对话与 usage 入库"; git push`
 
 ## 第 2 周预告（现在只需知道，w02 再展开）
 
@@ -375,9 +345,9 @@ jdbcClient.sql("""
 
 - [ ] 同一 session 连打 10 轮，日志里 `prompt_tokens` 逐轮上涨，开截断后趋稳
 - [ ] `GET /api/usage/daily` 当天 tokens 与 DeepSeek 平台用量一致，或差异能说清
-- [ ] `.\mvnw.cmd test` 全绿且不需要 Key（容器要在跑）
+- [ ] `.\mvnw.cmd test` 全绿且不需要 Key
 - [ ] `git grep -nE 'sk-[A-Za-z0-9]{20,}'` 无输出
-- [ ] `application-bailian.yml` 已写好；申请到 `DASHSCOPE_API_KEY` 后跑通一次（可放到第 2 周）
+- [ ] 申请到 `DASHSCOPE_API_KEY` 后用 bailian profile 跑通一次（可放到第 2 周）
 
 ## 踩坑记录（现象 → 排查 → 根因 → 解决）
 

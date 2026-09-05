@@ -12,7 +12,7 @@
 
 ### 2. Spring Boot 4 差异速览（~4h，只看跟自己相关的）
 
-> 2026-09-03 验收时决定**搁置**：不在 AI 主线上，阶段 1 写代码碰到 Jackson 3 / 测试切片差异时再按需补。demo-00-hello 的 README 里留有分层练习设计。
+> 2026-09-03 验收时决定**搁置**：不在 AI 主线上，阶段 1 写代码碰到 Jackson 3 / 测试切片差异时再按需补。分层练习设计保留在 huihui-ai README 附录。
 
 - [ ] Framework 7 + Boot 4 基线要求（JDK 17+，兼容到 26，我们直接用 25）
 - [ ] 对照官方 migration guide 扫一遍配置属性与自动装配的主要变化（不用背）
@@ -24,7 +24,7 @@
 - [x] Docker 跑通 PgVector（`pgvector/pgvector:pg17` 镜像 + 数据卷），客户端能连并 `CREATE EXTENSION vector`（2026-09-03 容器已起，重启持久化在验收时核）
 
 ### 4. 第一个调用（~2h）
-- [x] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter（demo-00-hello）
+- [x] 新建 Boot 4 项目，引入 Spring AI BOM（**≥ 2.0.1**）+ OpenAI 兼容 starter（demo-00-hello，2026-09-05 并入单一工程 huihui-ai 的 hello 包）
 - [x] application.yml 把 base-url 指向 DeepSeek/百炼，注入 ChatClient，写一个 GET 接口返回模型回答（2026-09-03 跑通）
 
 ## 验收标准（DoD）

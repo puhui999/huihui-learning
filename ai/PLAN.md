@@ -27,12 +27,12 @@
 
 | 阶段 | 周次 | 主题 | 预算 | 计划文件 | 产出 |
 |---|---|---|---|---|---|
-| 0 | 第 0 周 | 环境 + Spring Boot 4 前置 | ~12h | [stage-0](plan/stage-0-setup.md) | Hello ChatClient 跑通 |
-| 1 | 1-2 | 裸调 API 与流式输出 | ~50h | [stage-1](plan/stage-1-api-basics.md) | demo-01-chat-sse |
-| 2 | 3-4 | Spring AI 2.0 核心 | ~50h | [stage-2](plan/stage-2-spring-ai-core.md) | demo-02-tool-assistant |
-| 3 | 5-8 | RAG + 评估 ⭐ | ~100h | [stage-3](plan/stage-3-rag-evals.md) | demo-03-knowledge-base + 评估报告 |
-| 4 | 9-11 | Agent + MCP ⭐ | ~75h | [stage-4](plan/stage-4-agent-mcp.md) | demo-04-support-agent |
-| 5 | 12-13 | 编排 + 生产韧性 | ~50h | [stage-5](plan/stage-5-orchestration.md) | demo-05-workflow |
+| 0 | 第 0 周 | 环境 + Spring Boot 4 前置 | ~12h | [stage-0](plan/stage-0-setup.md) | `hello` 包：Hello ChatClient 跑通 |
+| 1 | 1-2 | 裸调 API 与流式输出 | ~50h | [stage-1](plan/stage-1-api-basics.md) | `chat` 包：多轮 + SSE + 模板 |
+| 2 | 3-4 | Spring AI 2.0 核心 | ~50h | [stage-2](plan/stage-2-spring-ai-core.md) | `tools` 包：工具调用助手 |
+| 3 | 5-8 | RAG + 评估 ⭐ | ~100h | [stage-3](plan/stage-3-rag-evals.md) | `rag` 包：知识库 + 评估报告 |
+| 4 | 9-11 | Agent + MCP ⭐ | ~75h | [stage-4](plan/stage-4-agent-mcp.md) | `agent` 包：客服 Agent + MCP |
+| 5 | 12-13 | 编排 + 生产韧性 | ~50h | [stage-5](plan/stage-5-orchestration.md) | `workflow` 包：编排与韧性 |
 | 6 | 14-17 | 作品集打磨 | ~100h | [stage-6](plan/stage-6-portfolio.md) | 旗舰 + 副项目两个独立仓库 |
 
 总计 ~437h。按**在职每周 ~25h** 排期；脱产每周 40h 可压到 11-12 周（顺序不变，逐阶段提前）。
@@ -42,7 +42,7 @@
 | 阶段 | 状态 | 开始日期 | 验收日期 | 备注 |
 |---|---|---|---|---|
 | 0 前置 | ✅ 已验收 | 2026-09-01 | 2026-09-03 | runbook 见 notes/w00-环境搭建.md；Boot 4 差异速览搁置，阶段 1 遇到再补 |
-| 1 裸调 API | 🔵 进行中 | 2026-09-03 | | runbook 见 notes/w01-裸调API与多轮对话.md；模型改 deepseek-v4-flash（deepseek-chat 已公告停用） |
+| 1 裸调 API | 🔵 进行中 | 2026-09-03 | | runbook 见 notes/w01-裸调API与多轮对话.md；模型改 deepseek-v4-flash（deepseek-chat 已公告停用）；2026-09-05 工程合并为 huihui-ai |
 | 2 Spring AI 核心 | ⬜ 未开始 | | | |
 | 3 RAG + 评估 | ⬜ 未开始 | | | |
 | 4 Agent + MCP | ⬜ 未开始 | | | |
@@ -60,15 +60,18 @@ ai/
 ├── PLAN.md                  # 本文件：总览 + 进度看板
 ├── plan/                    # 各阶段详细计划
 ├── notes/                   # 学习笔记与踩坑记录（见 notes/README.md）
-├── demo-00-hello/           # 阶段 0 产出：Hello ChatClient（Java 项目，下同）
-├── demo-01-chat-sse/        # 阶段 1 产出
-├── demo-02-tool-assistant/
-├── demo-03-knowledge-base/
-├── demo-04-support-agent/
-└── demo-05-workflow/
+└── huihui-ai/               # 唯一的 Java 工程（Boot 4.0.8 + Spring AI 2.0.1 + JDK 25），按阶段分包：
+    └── src/main/java/com/huihui/ai/
+        ├── hello/           # 阶段 0
+        ├── chat/            # 阶段 1
+        ├── tools/           # 阶段 2
+        ├── rag/             # 阶段 3
+        ├── agent/           # 阶段 4
+        ├── workflow/        # 阶段 5
+        └── common/          # 跨阶段共用：异常处理、usage 记账
 ```
 
-demo 随学随提交到本仓库；阶段 6 的旗舰/副项目打磨完成后抽成独立仓库用于作品集展示，此处保留开发版。
+2026-09-05 决定：所有阶段共用一个工程 `huihui-ai`，按阶段分包，环境只配一次（原 demo-00-hello 已并入 `hello` 包）；代码随学随提交。阶段 6 的旗舰/副项目从这个工程里抽出成独立仓库用于作品集展示，此处保留开发版。工程内约定见 [huihui-ai/README.md](huihui-ai/README.md)。
 
 ## 助教协作方式
 

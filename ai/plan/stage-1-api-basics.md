@@ -32,9 +32,9 @@
 - [ ] Prompt Injection 初识：亲手试"忽略以上指令"能否攻破自己的 system prompt
 - [ ] Prompt 模板管理：模板存库/配置文件，支持变量替换
 
-## 实战任务：demo-01-chat-sse
+## 实战任务：`chat` 包（huihui-ai 工程）
 
-Spring Boot 4 Web 应用：
+在 huihui-ai 里新增 `chat` 包，跨阶段共用的 usage 记账放 `common`（2026-09-05 起不再每阶段建 demo 工程）：
 1. 多轮对话（会话隔离，内存存储即可）
 2. SSE 流式输出 + 打字机前端页
 3. Token 用量面板接口：按天/按会话统计费用

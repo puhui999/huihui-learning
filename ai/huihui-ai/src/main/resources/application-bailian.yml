@@ -1,0 +1,22 @@
+# 切到阿里云百炼：.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=bailian"，或 IDEA Active profiles 填 bailian
+# 需要环境变量 DASHSCOPE_API_KEY；老域名仍可用，Key 与地域绑定（北京）。只写与默认配置不同的部分
+spring:
+  ai:
+    openai:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        model: qwen-plus
+
+app:
+  llm:
+    provider: bailian
+    base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    api-key: ${DASHSCOPE_API_KEY}
+    model: qwen-plus
+    pricing:                   # qwen-plus：输入 0.8 / 输出 2，缓存命中按输入价 10%；无峰谷
+      cache-hit: 0.08
+      cache-miss: 0.8
+      output: 2
+      off-peak-ratio: 1.0
+      peak-windows: []

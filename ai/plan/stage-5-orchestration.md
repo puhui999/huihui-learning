@@ -21,7 +21,7 @@
 - [ ] 无外网测试链路：用 WireMock 录制回放或自定义 ChatModel 桩替代真实 API，让单测/集成测试不依赖网络与额度
 - [ ] Java 25 虚拟线程：I/O 密集的工具调用并行化实测
 
-## 实战任务：demo-05-workflow
+## 实战任务：`workflow` 包（huihui-ai 工程）
 
 三角色协作：需求分析 Agent → 代码生成 Agent → 代码审查 Agent（审查不过打回重写，最多 2 轮）：
 1. Supervisor 或 Graph 编排，含条件分支与循环

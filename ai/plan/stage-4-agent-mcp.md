@@ -12,22 +12,22 @@
 ## 第 10 周：MCP 协议
 
 - [ ] MCP 概念：为什么要标准化工具协议；tools / resources / prompts 三类能力；Client-Server 架构
-- [ ] **用 MCP Java SDK 2.0 亲手写一个 MCP Server**：把 demo-03 的知识库检索包装成 MCP 工具（这一步价值最大，比用现成 server 学得多）
+- [ ] **用 MCP Java SDK 2.0 亲手写一个 MCP Server**：把 rag 包的知识库检索包装成 MCP 工具（这一步价值最大，比用现成 server 学得多）
 - [ ] Spring AI 作为 MCP Client：接自己的 server + 一个现成 server（如文件系统）
 - [ ] MCP 安全：鉴权（mcp-security 的 OAuth2 / API Key）；警惕恶意 server 返回内容也是注入面
 
 ## 第 11 周：LangChain4j 对比（3-5 天）+ 记忆分层
 
 - [ ] LangChain4j @AiService 声明式：@SystemMessage / @UserMessage / @V / @MemoryId
-- [ ] 用它复刻 demo-02 的一个子集，写一篇《Spring AI vs LangChain4j》笔记进 notes/（面试高频题）
+- [ ] 用它复刻 tools 包的一个子集，写一篇《Spring AI vs LangChain4j》笔记进 notes/（面试高频题）
 - [ ] 记忆分层：短期（对话窗口）/ 工作（当前任务上下文）/ 长期（用户画像，向量库存摘要）
 - [ ] Token 预算：历史过长时的摘要压缩策略
 
-## 实战任务：demo-04-support-agent
+## 实战任务：`agent` 包（huihui-ai 工程）
 
 智能客服 Agent（电商场景 mock）：
 1. 多轮对话 + 记忆持久化（跨会话记住用户偏好）
-2. 工具经 MCP 接入：订单查询、退款政策检索（连 demo-03）、工单创建
+2. 工具经 MCP 接入：订单查询、退款政策检索（连 rag 包）、工单创建
 3. 多步任务："我上周买的东西坏了怎么办" → 查订单 → 查政策 → 建工单，全程可观测
 4. 防注入：用户消息与外部内容（商品评论等）分层处理；危险操作（退款）要求二次确认
 

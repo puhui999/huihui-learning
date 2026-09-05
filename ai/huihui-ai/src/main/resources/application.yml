@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: huihui-ai
+  threads:
+    virtual:
+      enabled: true            # Tomcat 与应用线程池走虚拟线程；Boot 4 顺带把 Reactor boundedElastic 也切到虚拟线程
+  http:
+    clients:
+      connect-timeout: 5s
+      read-timeout: 90s        # 等待数据的空闲超时，不是整个响应总时长；流式每个 chunk 都会刷新它
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai   # w00 起的 pgvector 容器，usage 表与阶段 3 的向量表都在这个库
+    username: postgres
+    password: postgres
+  sql:
+    init:
+      mode: always             # 启动执行 classpath 下的 schema.sql（阶段 1 Day 5 加），用 CREATE TABLE IF NOT EXISTS 累加
+  ai:
+    openai:
+      # Spring AI 走的配置（阶段 0 的 hello、阶段 2 起）。DeepSeek 提供 OpenAI 兼容接口；Key 只从环境变量读，绝不写死在文件里
+      base-url: https://api.deepseek.com
+      api-key: ${DEEPSEEK_API_KEY}
+      chat:
+        model: deepseek-v4-flash   # 旧名 deepseek-chat 官方已公告停用；V4 默认开思考模式，Spring AI 怎么关到阶段 2 再学
+        temperature: 0.7
+
+app:
+  llm:
+    # 阶段 1 裸调 API 用的配置，由 chat.config.LlmProperties 绑定；供应商差异见 application-bailian.yml
+    provider: deepseek
+    base-url: https://api.deepseek.com
+    api-key: ${DEEPSEEK_API_KEY}
+    model: deepseek-v4-flash
+    thinking: false            # 显式关思考模式：思考 token 计入 completion 计费，首字延迟也大
+    pricing:                   # 元 / 百万 token，高峰价（2026-09-03 抄自定价页，Day 1 再核一遍）；闲时乘 off-peak-ratio
+      cache-hit: 0.1
+      cache-miss: 3
+      output: 9
+      off-peak-ratio: 0.5
+      peak-windows: ["09:00-12:00", "14:00-18:00"]   # 工作日北京时间为高峰，其余时段闲时；空列表表示无峰谷

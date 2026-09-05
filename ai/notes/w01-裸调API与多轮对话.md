@@ -8,7 +8,7 @@
 
 | 决策 | 内容 | 为什么 |
 |---|---|---|
-| 模型改用 `deepseek-v4-flash` | DeepSeek 2026-04-24 公告：`deepseek-chat` / `deepseek-reasoner` 于 2026-07-24 停用，文档现在只列 V4 三个模型。demo-00 的 `deepseek-chat` 还能通，只说明别名暂未真正下线 | 新代码不写在已宣布停用的别名上；Day 1 先 `GET /models` 看账号实际能用什么 |
+| 学习期间全程用 `deepseek-v4-flash`，不切 v4-pro（2026-09-05 你的决定） | DeepSeek 2026-04-24 公告：`deepseek-chat` / `deepseek-reasoner` 于 2026-07-24 停用，文档现在只列 V4 三个模型。demo-00 的 `deepseek-chat` 还能通，只说明别名暂未真正下线 | 新代码不写在已宣布停用的别名上；Day 1 先 `GET /models` 看账号实际能用什么 |
 | 显式关思考模式 `"thinking": {"type": "disabled"}` | V4 系列**默认开启**思考模式，思考 token 计入 completion 计费，首字延迟明显 | 本阶段学的是非思考对话；Day 2 做一次开思考的对照实验就够 |
 | Web MVC + `spring-boot-starter-webclient`，不上 WebFlux 服务端 | Boot 4.0.8 有独立的 webclient starter（只带 reactor-netty-http，不带 Netty 服务器）；MVC 控制器可以直接返回 `Flux<ServerSentEvent>`；DB 用普通 JDBC | 只在流式那一条链路碰 Reactor，其余保持你熟悉的阻塞式写法，不把时间花在响应式上 |
 | usage 表放在 pgvector 容器里的 Postgres `ai` 库 | 容器已在跑，不新起 | 阶段 3 的向量表也在这个库，一套连接配置用到底 |
@@ -23,7 +23,7 @@
 | 模型 | 上下文 | 最大输出 | 输入·缓存命中 高峰/闲时 | 输入·未命中 | 输出 |
 |---|---|---|---|---|---|
 | deepseek-v4-flash | 1M | 384K | ¥0.1 / ¥0.05 | ¥3 / ¥1.5 | ¥9 / ¥4.5 |
-| deepseek-v4-pro | 1M | 384K | ¥0.3 / ¥0.15 | ¥9 / ¥4.5 | ¥27 / ¥13.5 |
+| deepseek-v4-pro（只作对照，不用） | 1M | 384K | ¥0.3 / ¥0.15 | ¥9 / ¥4.5 | ¥27 / ¥13.5 |
 
 单位：元 / 百万 token。定价页数字以你 Day 1 抄进配置的为准，本表只是核实时的快照。
 
